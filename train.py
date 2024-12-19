@@ -5,6 +5,7 @@ from models import Autoencoder
 from dataset import dataset
 import torch as T
 from torch.utils.data import DataLoader,random_split
+import torch.nn as nn
 
 # hyperparameters
 batch_size = 2
