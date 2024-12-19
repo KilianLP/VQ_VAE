@@ -5,11 +5,20 @@ from models import Autoencoder
 from dataset import dataset
 import torch
 
+# hyperparameters
+batch_size = 2
+lr = 2e-3
+epochs = 60
+accumulation_step = 1
+n_resnet_blocks = 3
+channels = [1,64,128]
+n_embeddings = 128
+data_directory = '/content/drive/MyDrive/Data/all_spectrograms.csv'
+model_parameters_directory = ''
 # prepare data
 
-data = np.loadtxt('/content/drive/MyDrive/Data/all_spectrograms.csv', delimiter=',', dtype=np.float32)
+data = np.loadtxt(data_directory, delimiter=',', dtype=np.float32)
 tensor = torch.tensor(data).view(-1, 1, 2048, 2048)
-print(tensor.size())
 data = T.log(tensor)
 data_min = data.min()
 data_max = data.max()
@@ -23,27 +32,24 @@ dataset = Dataset(normalized_data)
 train_size = int(0.8 * len(dataset))
 test_size = len(dataset) - train_size
 
-
 train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
 
-dataloader = DataLoader(train_dataset, batch_size=2, shuffle=True)
-dataloader_test = DataLoader(test_dataset, batch_size=2, shuffle=True)
+dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+dataloader_test = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # prepare model
 
-autoencoder = Autoencoder(128,[1,64,128],3)
+autoencoder = Autoencoder(128,channels,n_resnet_block)
 device = T.device("cuda" if T.cuda.is_available() else "cpu")
 autoencoder.to(device)
 
-accumulation_step = 1
-
 loss_fn = nn.MSELoss()
-optimizer = optim.Adam(autoencoder.parameters(), lr = 2e-3)
+optimizer = optim.Adam(autoencoder.parameters(), lr = lr)
 
 # train
-wandb.init(project="VQ_VAE_Spectro_L")
+wandb.init(project="VQ_VAE")
 
-for _ in range(60):
+for _ in range(epochs):
   total_loss = 0
   psnr = 0
   autoencoder.train()
@@ -82,3 +88,5 @@ for _ in range(60):
       wandb.log({"test_mse_loss": loss_value.item()})
       wandb.log({"test_psnr": psnr})
 
+
+torch.save(autoencoder.state_dict(), model_parameters_directory + 'VQ_VAE_parameters.pth')
