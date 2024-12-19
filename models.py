@@ -39,11 +39,11 @@ class Encoder(nn.Module):
     self.net = nn.Sequential()
     for c in range(len(channels)-1):
       self.net.add_module(f"enc_block_{c}",EncoderBlock(channels[c],channels[c+1]))
-    
+
     self.net.add_module(f"conv_block_{1}",nn.Conv2d(channels[-1],channels[-1],3,stride = 1, padding = 1))
 
-    for _ in range(n_res):
-      self.net.add_module(f"res_block_{len(channels)}",ResidualLayer(channels[-1],channels[-1],channels[-1]))
+    for i in range(n_res):
+      self.net.add_module(f"res_block_{i}",ResidualLayer(channels[-1],channels[-1],channels[-1]))
 
   def forward(self,x):
     return self.net(x)
@@ -54,6 +54,7 @@ class EncoderBlock(nn.Module):
 
     self.net = nn.Sequential(
         nn.Conv2d(input_channel,out_channel,4,stride = 2, padding = 1),
+        nn.BatchNorm2d(out_channel),
         nn.ReLU(),
     )
 
@@ -66,6 +67,7 @@ class DecoderBlock(nn.Module):
 
     self.net = nn.Sequential(
         nn.ConvTranspose2d(input_channel,out_channel,3,stride = 2, padding = 1, output_padding = 1),
+        nn.BatchNorm2d(out_channel),
         )
 
   def forward (self,x):
@@ -78,13 +80,13 @@ class Decoder(nn.Module):
     self.net = nn.Sequential()
     for c in range(len(channels)-1):
       if c ==1:
-        for _ in range(n_res):
-          self.net.add_module(f"res_block_{c}",ResidualLayer(channels[c],channels[c],channels[c]))
+        for i in range(n_res):
+          self.net.add_module(f"res_block_{c+i}",ResidualLayer(channels[c],channels[c],channels[c]))
       if c != 0:
         self.net.add_module(f"relu_block_{c}",nn.ReLU())
 
       self.net.add_module(f"dec_block_{c}",DecoderBlock(channels[c],channels[c+1]))
-      
+
 
   def forward(self,x):
     return self.net(x)
@@ -96,9 +98,11 @@ class ResidualLayer(nn.Module):
 
     self.net = nn.Sequential(
         nn.ReLU(),
-        nn.Conv2d(input_channel,h_channel,3,stride = 1, padding = 1,bias=False), 
+        nn.Conv2d(input_channel,h_channel,3,stride = 1, padding = 1,bias=False),
+        nn.BatchNorm2d(h_channel),
         nn.ReLU(),
         nn.Conv2d(h_channel,out_channel,3,stride = 1, padding = 1,bias=False),
+        nn.BatchNorm2d(out_channel),
     )
 
   def forward(self,x):
@@ -112,9 +116,9 @@ class Autoencoder(nn.Module):
     super().__init__()
 
     self.encoder = Encoder(channels,n_res)
-    self.conv1 = nn.Conv2d(channels[-1],64,3,stride = 1, padding = 1)
-    self.vector_quantizer = EfficientVectorQuantizer(64,n_emb)
-    self.conv2 = nn.Conv2d(64,channels[-1],3,stride = 1, padding = 1)
+    self.conv1 = nn.Conv2d(channels[-1],channels[-1],3,stride = 1, padding = 1)
+    self.vector_quantizer = EfficientVectorQuantizer(channels[-1],n_emb)
+    self.conv2 = nn.Conv2d(channels[-1],channels[-1],3,stride = 1, padding = 1)
     self.decoder = Decoder(channels[::-1],n_res)
 
     self.tanh = nn.Tanh()
