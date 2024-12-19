@@ -3,7 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from models import Autoencoder
 
-autoencoder = Autoencodet()
+# hyperparameters
+n_resnet_blocks = 3
+channels = [1,64,128]
+n_embeddings = 128
+
+autoencoder = Autoencoder()
 autoencoder.load_state_dict(torch.load("model_state.pth"))
 
 images = []
