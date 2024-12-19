@@ -1,7 +1,10 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from models import Autoencoder
 
+autoencoder = Autoencodet()
+autoencoder.load_state_dict(torch.load("model_state.pth"))
 
 images = []
 for i in range(5):
