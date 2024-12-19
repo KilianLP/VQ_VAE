@@ -7,8 +7,9 @@ from models import Autoencoder
 n_resnet_blocks = 3
 channels = [1,64,128]
 n_embeddings = 128
+model_
 
-autoencoder = Autoencoder()
+autoencoder = Autoencoder(n_embeddings,channels,n_resnet_block)
 autoencoder.load_state_dict(torch.load("model_state.pth"))
 
 images = []
