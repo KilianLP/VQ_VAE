@@ -2,6 +2,7 @@ import torch.optim as optim
 import wandb
 import numpy as np
 from models import Autoencoder
+from dataset import dataset
 import torch
 
 # prepare data
@@ -15,7 +16,20 @@ data_max = data.max()
 
 normalized_data = 2 * (data - data_min) / (data_max - data_min) - 1
 
+from torch.utils.data import DataLoader,random_split
 
+dataset = Dataset(normalized_data)
+
+train_size = int(0.8 * len(dataset))
+test_size = len(dataset) - train_size
+
+
+train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+
+dataloader = DataLoader(train_dataset, batch_size=2, shuffle=True)
+dataloader_test = DataLoader(test_dataset, batch_size=2, shuffle=True)
+
+# prepare model
 
 autoencoder = Autoencoder(128,[1,64,128],3)
 device = T.device("cuda" if T.cuda.is_available() else "cpu")
@@ -26,6 +40,7 @@ accumulation_step = 1
 loss_fn = nn.MSELoss()
 optimizer = optim.Adam(autoencoder.parameters(), lr = 2e-3)
 
+# train
 wandb.init(project="VQ_VAE_Spectro_L")
 
 for _ in range(60):
