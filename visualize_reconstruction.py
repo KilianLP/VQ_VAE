@@ -9,6 +9,7 @@ n_resnet_blocks = 3
 channels = [1,64,128]
 n_embeddings = 128
 model_parameters_directory = ''
+data_directory = 
 
 autoencoder = Autoencoder(n_embeddings,channels,n_resnet_block)
 autoencoder.load_state_dict(torch.load(model_parameters_directory))
@@ -18,6 +19,12 @@ autoencoder.to(device)
 data = np.loadtxt(data_directory, delimiter=',', dtype=np.float32)
 tensor = T.tensor(data).view(-1, 1, 2048, 2048)
 data = T.log(tensor)
+data_min = data.min()
+data_max = data.max()
+
+normalized_data = 2 * (data - data_min) / (data_max - data_min) - 1
+
+test_dataset = Dataset(normalized_data)
 
 images = []
 for i in range(5):
