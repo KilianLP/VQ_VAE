@@ -3,7 +3,7 @@ import wandb
 import numpy as np
 from models import Autoencoder
 from dataset import dataset
-import torch
+import torch as T
 from torch.utils.data import DataLoader,random_split
 
 # hyperparameters
@@ -19,7 +19,7 @@ model_parameters_directory = ''
 # prepare data
 
 data = np.loadtxt(data_directory, delimiter=',', dtype=np.float32)
-tensor = torch.tensor(data).view(-1, 1, 2048, 2048)
+tensor = T.tensor(data).view(-1, 1, 2048, 2048)
 data = T.log(tensor)
 data_min = data.min()
 data_max = data.max()
@@ -88,4 +88,4 @@ for _ in range(epochs):
       wandb.log({"test_psnr": psnr})
 
 
-torch.save(autoencoder.state_dict(), model_parameters_directory + 'VQ_VAE_parameters.pth')
+T.save(autoencoder.state_dict(), model_parameters_directory + 'VQ_VAE_parameters.pth')
