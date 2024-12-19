@@ -15,6 +15,10 @@ autoencoder.load_state_dict(torch.load(model_parameters_directory))
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 autoencoder.to(device)
 
+data = np.loadtxt(data_directory, delimiter=',', dtype=np.float32)
+tensor = T.tensor(data).view(-1, 1, 2048, 2048)
+data = T.log(tensor)
+
 images = []
 for i in range(5):
     k = random.randrange(1, len(test_dataset))
