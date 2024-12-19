@@ -2,15 +2,16 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 from models import Autoencoder
+import torch
 
 # hyperparameters
 n_resnet_blocks = 3
 channels = [1,64,128]
 n_embeddings = 128
-model_
+model_parameters_directory = ''
 
 autoencoder = Autoencoder(n_embeddings,channels,n_resnet_block)
-autoencoder.load_state_dict(torch.load("model_state.pth"))
+autoencoder.load_state_dict(torch.load(model_parameters_directory))
 
 images = []
 for i in range(5):
