@@ -1,6 +1,21 @@
 import torch.optim as optim
 import wandb
+import numpy as np
 from models import Autoencoder
+import torch
+
+# prepare data
+
+data = np.loadtxt('/content/drive/MyDrive/Data/all_spectrograms.csv', delimiter=',', dtype=np.float32)
+tensor = torch.tensor(data).view(-1, 1, 2048, 2048)
+print(tensor.size())
+data = T.log(tensor)
+data_min = data.min()
+data_max = data.max()
+
+normalized_data = 2 * (data - data_min) / (data_max - data_min) - 1
+
+
 
 autoencoder = Autoencoder(128,[1,64,128],3)
 device = T.device("cuda" if T.cuda.is_available() else "cpu")
