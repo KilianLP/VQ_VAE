@@ -39,7 +39,7 @@ dataloader_test = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # prepare model
 
-autoencoder = Autoencoder(128,channels,n_resnet_block)
+autoencoder = Autoencoder(n_embeddings,channels,n_resnet_block)
 device = T.device("cuda" if T.cuda.is_available() else "cpu")
 autoencoder.to(device)
 
