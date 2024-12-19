@@ -12,6 +12,8 @@ model_parameters_directory = ''
 
 autoencoder = Autoencoder(n_embeddings,channels,n_resnet_block)
 autoencoder.load_state_dict(torch.load(model_parameters_directory))
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+autoencoder.to(device)
 
 images = []
 for i in range(5):
