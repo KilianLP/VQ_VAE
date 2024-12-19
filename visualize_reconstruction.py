@@ -9,7 +9,7 @@ n_resnet_blocks = 3
 channels = [1,64,128]
 n_embeddings = 128
 model_parameters_directory = ''
-data_directory = 
+data_directory = ''
 
 autoencoder = Autoencoder(n_embeddings,channels,n_resnet_block)
 autoencoder.load_state_dict(torch.load(model_parameters_directory))
