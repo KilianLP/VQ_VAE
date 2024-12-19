@@ -4,6 +4,7 @@ import numpy as np
 from models import Autoencoder
 from dataset import dataset
 import torch
+from torch.utils.data import DataLoader,random_split
 
 # hyperparameters
 batch_size = 2
@@ -24,8 +25,6 @@ data_min = data.min()
 data_max = data.max()
 
 normalized_data = 2 * (data - data_min) / (data_max - data_min) - 1
-
-from torch.utils.data import DataLoader,random_split
 
 dataset = Dataset(normalized_data)
 
